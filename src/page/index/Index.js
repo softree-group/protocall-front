@@ -1,10 +1,10 @@
-import Phone from "../../components/phone/Phone";
+import PhoneAuth from "../../components/phone/Auth/PhoneAuth";
 import "./index.css";
 
 export default function Index() {
    return (
        <div className="index-container">
-           <Phone/>
+           <PhoneAuth/>
        </div>
    )
 }

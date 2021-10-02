@@ -1,4 +1,4 @@
-.phone-auth-form {
+.block {
     width: 100%;
     max-width: 500px;
     background: white;
@@ -6,43 +6,3 @@
     padding: 20px;
     border-radius: 10px;
 }
-
-.phone-auth-form .auth-title {
-    text-align: center;
-    padding-bottom: 5px;
-    font-size: 1.7em;
-    font-weight: bold;
-}
-
-.phone-auth-form form {
-    display: flex;
-    flex-direction: column;
-}
-
-.phone-auth-form form input[type=submit] {
-    margin-top: 10px;
-    width: 100%;
-    font-size: 1.2em;
-}
-
-.field {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-.field .field-name {
-    padding-bottom: 5px;
-    font-size: 1.2em;
-}
-
-.field input {
-    font-size: 1em;
-    width: 100%;
-}
-
-input {
-    font-size: 1em;
-}
-
-
-
