@@ -59,7 +59,6 @@ function PhoneAuth() {
                </div>
                <input type="submit" value="Connect"/>
            </form>
-           <div className="button">Стоп</div>
        </div>
    )
 }
