@@ -34,6 +34,10 @@ function PhoneAuth() {
            },
            'confirmed': function(e) {
                console.log('call confirmed');
+           },
+           'addstream': e => {
+               console.log("ADD STREAM", e.stream)
+
            }
        };
 
@@ -42,7 +46,15 @@ function PhoneAuth() {
            'mediaConstraints': {'audio': true, 'video': false},
        };
 
-       const session = ua.call('000', options);
+       ua.on("registrationFailed", e => {
+           console.log("registrationFailed")
+       })
+
+       ua.on("registered", e => {
+           console.log("registered")
+
+           const session = ua.call("000", options)
+       })
    }
 
    return (
@@ -59,7 +71,7 @@ function PhoneAuth() {
                </div>
                <input type="submit" value="Connect"/>
            </form>
-           <div className="button">Стоп</div>
+           <audio id="remoteAudio"/>
        </div>
    )
 }
