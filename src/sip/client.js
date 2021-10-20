@@ -52,6 +52,7 @@ export class SIPClient {
 
         this.registerer.stateChange.addListener(async (state) => {
             console.log(`Registration state changed to ${state}`);
+
             this.registrationStateChangeListener && this.registrationStateChangeListener(state);
         });
 
@@ -131,10 +132,11 @@ export class SIPClient {
                 await this.currentCall?.bye();
             }
         }
+
+        this.cleanupMedia();
     }
 
     set microphone(value) {
-        // @ts-ignore
         const connection = this.currentCall?.sessionDescriptionHandler?.peerConnection;
 
         if (connection) {
