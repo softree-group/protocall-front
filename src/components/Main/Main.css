@@ -1,0 +1,206 @@
+.main-page_wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #282c34;
+    overflow: hidden;
+}
+
+.main-page_control {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    height: 90%;
+    max-height: 500px;
+}
+
+.main-page_button-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.5s;
+    overflow: hidden;
+}
+
+.main-page_button-wrapper.full {
+    width: 100% !important;
+    border-radius: 20px;
+}
+
+.main-page_button-wrapper.none {
+    width: 0 !important;
+    opacity: 0;
+}
+
+.main-page_button-wrapper.start {
+    left: 0;
+    width: 65%;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.main-page_button-wrapper.join {
+    right: 0;
+    width: 33%;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.main-page_button-wrapper:hover {
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+}
+
+.main-page_button-wrapper.full:hover {
+    cursor: default;
+    background: rgba(255,255,255,0.1);
+}
+
+.button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.5s;
+    overflow: hidden;
+    opacity: 1;
+}
+
+.button p {
+    width: max-content;
+}
+
+.main-page_button-wrapper .button {
+    position: absolute;
+    color: white;
+    font-size: 1.1em;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
+}
+
+.main-page_button-wrapper .button img {
+    filter: invert();
+    width: 60%;
+}
+
+.background-rocket {
+    filter: invert();
+    opacity: 0.2;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    transform: rotate(45deg) translate(0,100px);
+}
+
+.main-page_log-in-button {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    width: max-content;
+    background: rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    transition: background-color 0.5s;
+    color: white;
+    border-radius: 10px;
+}
+
+.main-page_log-in-button:hover {
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+}
+
+.logo {
+    position: absolute;
+    color: rgba(255,255,255,0.3);
+    left: 20px;
+    top: 10px;
+    font-size: 32px;
+    transition: color 0.5s;
+}
+
+.logo:hover {
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+}
+
+.main-page_button-wrapper .action-form {
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+    overflow: hidden;
+    transition: all 0.5s;
+}
+
+.action-form.start {
+    left: 0;
+}
+
+.action-form.join {
+    right: 0;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.action-form_title {
+    color: white;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    padding: 15px;
+    width: max-content;
+}
+
+.action-form_form {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s;
+}
+
+.form-input .label {
+    color: white;
+    padding-bottom: 7px;
+}
+
+.form-input input {
+    width: 100%;
+}
+
+.form-input {
+    padding-top: 10px;
+}
+
+.form-input .hint {
+    color: rgba(255,255,255, 0.7);
+    padding-top: 3px;
+    font-size: 10px;
+}
+
+.action-form_form input[type=submit] {
+    background: rgba(255,255,255, 0.2);
+    font-size: 18px;
+    /*margin: 0 auto;*/
+    width: 100%;
+    margin-top: 10px;
+}
+
+.action-form.start.hidden {
+    left: -200%;
+}
+
+.action-form.join.hidden {
+    left: unset;
+    right: -200%;
+}

@@ -9,3 +9,11 @@ export const inputChangeHandler = (event, stateHandler, localStorageKey) => {
         return newState;
     })
 }
+
+export const getAudioElement = () => {
+    const el = document.getElementById("remoteAudio");
+    if (!(el instanceof HTMLAudioElement)) {
+        throw new Error(`Element "remoteAudio" not found or not an audio element.`);
+    }
+    return el;
+}
