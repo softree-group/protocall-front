@@ -5,25 +5,32 @@ import Conference from "./components/Conference/Conference";
 import {UserContext} from "./context/userContext";
 import {useEffect, useRef, useState} from "react";
 import {Redirect} from "react-router";
+import axios from "axios";
+import {API} from "./backend/api";
 
 function App() {
   const [userData, setUserData] = useState(null);
   const audioRef = useRef(null);
   const setUserDataHandler = (data) => {
-      localStorage.setItem("account", JSON.stringify(data));
       setUserData(data);
   }
   const delUserData = () => {
-      localStorage.removeItem("account");
       setUserData(null);
   }
 
   useEffect(() => {
-      const item = JSON.parse(localStorage.getItem("account"));
-      if (!item) {
-          return
-      }
-      setUserData(item);
+      axios.get(API.session)
+          .then(response => {
+              if (response.status === 200) {
+                  setUserData(response.data);
+                  return;
+              }
+              setUserData(null);
+          })
+          .catch(err => {
+              console.error(err);
+              setUserData(null);
+          })
   }, []);
 
   return (

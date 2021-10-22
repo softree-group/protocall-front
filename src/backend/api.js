@@ -3,13 +3,17 @@ export const API = {
     join: id => `/conference/${id}/join`,
     leave: "/conference/leave",
     record: "/conference/record",
-    ready: "/conference/ready"
+    ready: "/conference/ready",
+    session: "/session"
 }
 
 function setPrefix(prefix, API) {
     for (const property in API) {
         if (API[property] instanceof Function) {
-            API[property] = (...args) => '/api' + API[property](...args)
+            const tmpFunc = API[property];
+            API[property] = (...args) => "/api" + tmpFunc(...args);
+
+            continue;
         }
         API[property] = '/api' + API[property]
     }

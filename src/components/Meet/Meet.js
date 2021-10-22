@@ -35,7 +35,7 @@ function Meet(props) {
     return (
         <div className="meet-wrapper">
             <div className="meet_status-bar">
-                <p className="meet_status-bar_text">12341</p>
+                <p className="meet_status-bar_text">{userData["conference"]["id"]}</p>
                 <p className="meet_status-bar_text">Speaker Name</p>
                 <p className="meet_status-bar_text"><Timer startedTime={props.startedTime} isRunning={true}/></p>
             </div>
@@ -53,7 +53,7 @@ function Meet(props) {
                 <div className="meet_control-panel_button video" onClick={e => setWithoutVideo(!withoutVideo)}>
                     <img src={withoutVideo ? videoOff : video} alt="video"/>
                 </div>
-                {!isRecording && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
+                {!isRecording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
                     <span>rec</span>
                 </div>}
                 <div onClick={() => props.handleOnTerminate()} className="meet_control-panel_button leave">
