@@ -10,13 +10,14 @@ import Timer from "./Timer/Timer";
 import axios from "axios";
 import {API} from "../../backend/api";
 import {UserContext} from "../../context/userContext";
+import {useHistory} from "react-router";
 
 function Meet(props) {
     const [mute, setMute] = useState(false);
     const [withoutVideo, setWithoutVideo] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
 
-    const {userData} = useContext(UserContext);
+    const {userData, delUserData} = useContext(UserContext);
 
     const isHost = userData["account"]["username"] === userData["conference"]["host_user_id"]
 
@@ -30,6 +31,21 @@ function Meet(props) {
             )
             .catch(err => console.error(err));
         setIsRecording(true);
+    }
+
+    const history = useHistory();
+
+    const handleOnLeave = () => {
+        axios.post(API.leave)
+            .then(response => {
+                delUserData();
+                history.push("/");
+            })
+            .catch(err => {
+                console.error(err);
+                delUserData();
+                history.push("/");
+            })
     }
 
     return (
@@ -56,7 +72,7 @@ function Meet(props) {
                 {!isRecording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
                     <span>rec</span>
                 </div>}
-                <div onClick={() => props.handleOnTerminate()} className="meet_control-panel_button leave">
+                <div onClick={() => handleOnLeave()} className="meet_control-panel_button leave">
                     <img src={leavePhone} alt="leave"/>
                 </div>
             </div>
