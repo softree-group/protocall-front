@@ -4,7 +4,8 @@ export const API = {
     leave: "/conference/leave",
     record: "/conference/record",
     ready: "/conference/ready",
-    session: "/session"
+    session: "/session",
+    conferenceInfo: "/conference",
 }
 
 function setPrefix(prefix, API) {

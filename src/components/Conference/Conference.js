@@ -3,8 +3,10 @@ import Connection from "../Connection/Connection";
 import Meet from "../Meet/Meet";
 import {SIPClient} from "../../sip/client";
 import {SessionState} from "sip.js";
-import {UserContext} from "../../context/userContext";
+import {UserContext} from "../../context/context";
 import {useHistory} from "react-router";
+import axios from "axios";
+import {API} from "../../backend/api";
 
 function Conference(props) {
     const [connected, SetConnected] = useState(false);
@@ -113,7 +115,7 @@ function Conference(props) {
 
     return <>
         <audio ref={props.audioRef}/>
-        {connected && <Meet startedTime={startedTime} handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
+        {connected && <Meet handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
         {!connected && <Connection connectionHandler={SetConnected} registrationState={registrationState}/>}
     </>
 }

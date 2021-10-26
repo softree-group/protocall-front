@@ -2,18 +2,16 @@ import './App.css';
 import Main from "./components/Main/Main";
 import {Switch, Route} from "react-router-dom";
 import Conference from "./components/Conference/Conference";
-import {UserContext} from "./context/userContext";
+import {UserContext} from "./context/context";
 import {useEffect, useRef, useState} from "react";
-import {Redirect} from "react-router";
 import axios from "axios";
 import {API} from "./backend/api";
+import Join from "./components/Join/Join";
+import Meet from "./components/Meet/Meet";
 
 function App() {
   const [userData, setUserData] = useState(null);
   const audioRef = useRef(null);
-  const setUserDataHandler = (data) => {
-      setUserData(data);
-  }
   const delUserData = () => {
       setUserData(null);
   }
@@ -29,15 +27,16 @@ function App() {
           })
           .catch(err => {
               console.error(err);
-              setUserData(null);
+              delUserData();
           })
   }, []);
 
   return (
-      <UserContext.Provider value={{userData, setUserData: setUserDataHandler, delUserData}}>
+      <UserContext.Provider value={{userData, setUserData, delUserData}}>
           <audio ref={audioRef}/>
           <Switch>
               <Route exact path="/" component={Main}/>
+              <Route path="/join/:meetID" component={Join}/>
               <Route path="/meet" component={() => <Conference audioRef={audioRef}/>}/>
           </Switch>
       </UserContext.Provider>
