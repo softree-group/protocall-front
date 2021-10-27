@@ -2,18 +2,15 @@ import Participant from "./Participant";
 import "./Participants.css";
 import {useContext, useState} from "react";
 import {ConferenceContext, UserContext} from "../../../context/context";
+import {useSelector} from "react-redux";
 
 function Participants() {
-    const {conference} = useContext(ConferenceContext);
     const {userData} = useContext(UserContext);
     const [clicked, setClicked] = useState(false);
-    let users = [];
-    if (!conference) {
-        users = []
-    } else {
-        users = conference.participants.filter(user => user.id !== userData.account.username);
-    }
-    const link = conference && window.location.origin + "/join/" + conference.id;
+    const participants = useSelector(state => state.conference.participants);
+    const conferenceID = useSelector(state => state.conference.id);
+    const users = participants.filter(user => user.id !== userData.account.username);
+    const link = conferenceID && window.location.origin + "/join/" + conferenceID;
     const copyHandler = () => {
         navigator.clipboard.writeText(link)
             .then(() => {

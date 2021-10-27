@@ -7,6 +7,7 @@ import {UserContext} from "../../context/context";
 import {useHistory} from "react-router";
 import axios from "axios";
 import {API} from "../../backend/api";
+import Centrifuge from "centrifuge";
 
 function Conference(props) {
     const [connected, SetConnected] = useState(false);

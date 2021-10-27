@@ -5,13 +5,16 @@ import microphone from "../../images/microphone.svg";
 import microphoneMute from "../../images/microphone_mute.svg"
 import video from "../../images/video.svg";
 import videoOff from "../../images/video_off.svg";
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Timer from "./Timer/Timer";
 import axios from "axios";
 import {API} from "../../backend/api";
 import {ConferenceContext, UserContext} from "../../context/context";
 import {useHistory} from "react-router";
 import Participants from "./Participants/Participants";
+import Centrifuge from "centrifuge";
+import {useDispatch, useSelector} from "react-redux";
+import {connected, endConference, leave, newConference, startRecording} from "../../redux/actions";
 
 function devUserData() {
     return {
@@ -30,18 +33,64 @@ function devUserData() {
 function Meet(props) {
     const [mute, setMute] = useState(false);
     const [withoutVideo, setWithoutVideo] = useState(false);
-    const [isRecording, setIsRecording] = useState(false);
-    const [conference, setConference] = useState(null);
 
     const {userData, delUserData} = useContext(UserContext);
 
+    const dispatch = useDispatch();
+    const isRecording = useSelector(state => state.conference.is_recording);
+    const startedAt = useSelector(state => state.conference.started_at);
+
+
+    const eventHandler = useCallback( (event) => {
+        console.log(event)
+        switch (event.event) {
+            case "end":
+                history.push("/");
+                delUserData();
+                dispatch(endConference());
+                return;
+            case "start_record":
+                dispatch(startRecording());
+                return;
+            case "connected":
+                dispatch(connected(event.user));
+                return;
+            case "leave":
+                dispatch(leave(event.user));
+                return;
+            default:
+                console.log();
+        }
+    }, []);
+
+    useEffect(() => {
+        const centrifuge = new Centrifuge("wss://" + window.location.host + "/connection/websocket")
+        centrifuge.setToken(userData["cent_token"]);
+
+        centrifuge.on('connect', function(ctx) {
+            console.log("connected", ctx);
+        });
+
+        centrifuge.on('disconnect', function(ctx) {
+            console.log("disconnected", ctx);
+        });
+
+        centrifuge.subscribe("conference~" + userData["conference"]["id"], function(ctx) {
+            eventHandler(ctx.data)
+        });
+
+        centrifuge.connect();
+        return () => centrifuge.disconnect()
+    }, []);
+
     const isHost = userData["account"]["username"] === userData["conference"]["host_user_id"]
+    console.log("IS_HOST", isHost, userData)
 
     useEffect(() => {
         axios.get(API.conferenceInfo)
             .then(response => {
                 console.log(response.data);
-                setConference(response.data);
+                dispatch(newConference(response.data));
             })
             .catch(err => {
                 console.log(err);
@@ -54,7 +103,7 @@ function Meet(props) {
             .then(response => {
                     if (response.status === 200) {
                         console.log("record started");
-                        setConference({...conference, is_recording: true})
+                        dispatch(startRecording());
                     }
                 }
             )
@@ -76,18 +125,15 @@ function Meet(props) {
             })
     }
 
-    console.log("CONF", conference)
-
     return (
-        <ConferenceContext.Provider value={{conference, setConference}}>
             <div className="meet-wrapper">
                 <div className="meet_status-bar">
                     <p className="meet_status-bar_text">{userData["conference"]["id"]}</p>
                     {/*<p className="meet_status-bar_text"></p>*/}
-                    <p className="meet_status-bar_text"><Timer startedTime={conference ? new Date(conference["started_at"] * 1000) : null} isRunning={!!conference}/></p>
+                    <p className="meet_status-bar_text"><Timer startedTime={startedAt ? new Date(startedAt * 1000) : null} isRunning={!!startedAt}/></p>
                 </div>
-                <div className={"recording_status" + (conference && conference.is_recording ? " enabled" : " disabled")}/>
-                <Participants participants={conference ? conference.participants : []}/>
+                <div className={"recording_status" + (isRecording ? " enabled" : " disabled")}/>
+                <Participants/>
                 <div className="meet_control-panel">
                     <div className="meet_control-panel_button participants">
                         <img src={avatar} alt="participants"/>
@@ -102,7 +148,7 @@ function Meet(props) {
                     <div className="meet_control-panel_button video" onClick={e => setWithoutVideo(!withoutVideo)}>
                         <img src={withoutVideo ? videoOff : video} alt="video"/>
                     </div>
-                    {conference && !conference.is_recording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
+                    {!isRecording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
                         <span>rec</span>
                     </div>}
                     <div onClick={() => handleOnLeave()} className="meet_control-panel_button leave">
@@ -110,7 +156,6 @@ function Meet(props) {
                     </div>
                 </div>
             </div>
-        </ConferenceContext.Provider>
     )
 }
 
