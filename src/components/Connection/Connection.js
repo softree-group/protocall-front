@@ -1,12 +1,20 @@
 import "./Connection.css";
 import rocket from "../../images/rocket.svg"
 import planet from "../../images/planet.svg"
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {API} from "../../backend/api";
+import Centrifuge from "centrifuge";
+import {UserContext} from "../../context/context";
+import {useHistory} from "react-router";
 
 function Connection(props) {
-    const [progress, setProgress] = useState(5)
+    const [progress, setProgress] = useState(5);
+    const [centConnected, setCentConnected] = useState(false);
+
+    const {userData, delUserData} = useContext(UserContext);
+    const history = useHistory();
+
     const wrapperStyle = {
         "bottom": `${progress}%`
     }
@@ -14,6 +22,47 @@ function Connection(props) {
     const rocketStyle = {
         "transform": `translate(-50%, 0) scale(${1 - progress/100})`
     }
+
+
+    const eventHandler = (data) => {
+        console.log("EVENT DATA: ", data)
+        switch (data.event) {
+            case "ready":
+                done();
+                break;
+            case "fail":
+                delUserData();
+                console.error("fail to connect: ", data.message)
+                history.push("/");
+                break;
+            default:
+                console.warn("unexpected event: ", data.event)
+        }
+    }
+
+    useEffect(() => {
+        if (userData === null) {
+            return;
+        }
+        const centrifuge = new Centrifuge("wss://" + window.location.host + "/connection/websocket")
+        centrifuge.setToken(userData["cent_token"]);
+
+        centrifuge.on('connect', function(ctx) {
+            console.log("connected", ctx);
+            setCentConnected(true);
+        });
+
+        centrifuge.on('disconnect', function(ctx) {
+            console.log("disconnected", ctx);
+        });
+
+        centrifuge.subscribe("notify#" + userData.account.username, function(ctx) {
+            eventHandler(ctx.data)
+        });
+
+        centrifuge.connect();
+        return () => centrifuge.disconnect()
+    }, [userData]);
 
     useEffect(() => {
        const timer = setInterval(() => {
@@ -27,22 +76,13 @@ function Connection(props) {
        return () => clearInterval(timer);
     });
 
-
     useEffect(() => {
-        if (props.registrationState !== "Registered") {
+        if (props.registrationState !== "Registered" || !centConnected) {
             return
         }
         setProgress(50);
-        axios.post(API.ready)
-            .then(response => {
-                if (response.status !== 200) {
-                    console.error(response.status, response.data)
-                    return
-                }
-                done();
-            })
-            .catch(err => console.error(err))
-    }, [props.registrationState])
+        props.call();
+    }, [props.registrationState, centConnected])
 
     const done = () => {
         setProgress(90);
