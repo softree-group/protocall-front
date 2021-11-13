@@ -1,19 +1,19 @@
 import {CONFERENCE, SOCKET} from "../types";
 
 const initialState = {
-    "id": null,
-    "participants": [],
-    "is_recording": false,
-    "started_at": null
+    id: null,
+    participants: [],
+    is_recording: false,
+    started_at: null
 }
 
 export const conferenceReducer = (state = initialState, action) => {
     switch (action.type) {
         case SOCKET.CONNECTED:
-            const found = state.participants.findIndex(user => user.id === action.payload.id)
-            console.log("FOUND", found);
-            if (found !== -1) {
-                return state;
+            const foundIdx = state.participants.findIndex(user => user.id === action.payload.id)
+            if (foundIdx !== -1) {
+                const [found] = state.participants.splice(foundIdx, 1);
+                return {...state, participants: [...state.participants, action.payload]}
             }
             return {...state, participants: [...state.participants, action.payload]}
         case SOCKET.LEAVE:

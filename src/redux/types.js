@@ -10,3 +10,9 @@ export const CONFERENCE = {
     NEW: "conference/new",
     START_RECORD: "conference/start_record",
 }
+
+export const STREAM = {
+    ADD: "stream/add",
+    DELETE: "stream/delete",
+    DELETE_ALL: "stream/delete_all",
+}

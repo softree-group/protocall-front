@@ -4,6 +4,9 @@
 const JsSIP = require("jssip");
 const sdp = require("sdp-interop");
 
+const reSDPLabel = /a=label:([\d.]+)/;
+const reSDPMSID = /a=msid:([^\s]+)/g;
+
 export function CyberMegaPhone(id, name, password, host, register, audio=true, video=true) {
     EasyEvent.call(this);
     this.id = id;
@@ -111,9 +114,18 @@ CyberMegaPhone.prototype.connect = function () {
         rtc.on("sdp", function (data) {
             let isFirefox = typeof InstallTrigger !== 'undefined';
             let isChrome = !!window.chrome;// || window.safari;
-            console.log("IS_CHROME: ", isChrome);
-            console.log("SDP: ", data.sdp)
+            // console.log("SDP: ", data.sdp)
 
+            const matchMSID = [...data.sdp.matchAll(reSDPMSID)]
+            const msid = matchMSID[matchMSID.length - 1][1];
+
+            const match = data.sdp.match(reSDPLabel);
+            let channel = "";
+            if (match !== null) {
+                channel = match[1];
+            }
+
+            that.raise("channel", {id: msid, channel: channel});
 
             if (isFirefox && data.originator === 'remote') {
                 data.sdp = data.sdp.replace(/actpass/g, 'active');
@@ -136,8 +148,9 @@ CyberMegaPhone.prototype.connect = function () {
         bubble(rtc, 'ended');
 
         rtc.connection.ontrack = function (event) {
-            console.log('ontrack: ' + event.track.kind + ' - ' + event.track.id +
-                ' stream ' + event.streams[0].id);
+            console.log("ontrack event: ", event);
+            // console.log('ontrack: ' + event.track.kind + ' - ' + event.track.id +
+            //     ' stream ' + event.streams[0].id);
             if (event.track.kind === 'video') {
                 event.track.enabled = false;
             }

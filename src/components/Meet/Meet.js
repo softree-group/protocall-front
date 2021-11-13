@@ -5,7 +5,7 @@ import microphone from "../../images/microphone.svg";
 import microphoneMute from "../../images/microphone_mute.svg"
 import video from "../../images/video.svg";
 import videoOff from "../../images/video_off.svg";
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Timer from "./Timer/Timer";
 import axios from "axios";
 import {API} from "../../backend/api";
@@ -14,7 +14,7 @@ import {useHistory} from "react-router";
 import Participants from "./Participants/Participants";
 import Centrifuge from "centrifuge";
 import {useDispatch, useSelector} from "react-redux";
-import {connected, endConference, leave, newConference, startRecording} from "../../redux/actions";
+import {actionsStream, connected, endConference, leave, newConference, startRecording} from "../../redux/actions";
 
 function devUserData() {
     return {
@@ -39,15 +39,33 @@ function Meet(props) {
     const dispatch = useDispatch();
     const isRecording = useSelector(state => state.conference.is_recording);
     const startedAt = useSelector(state => state.conference.started_at);
+    const userVideo = useSelector( state => state.stream.local.video);
+    const remotes = useSelector(state => state.stream.remote);
 
+    const localVideo = useRef(null);
+    const localVideoOverlay = useRef(null);
+
+    console.log("REMOTES: ", remotes);
+
+    useEffect(() => {
+        if (!localVideo.current) {
+            console.log("No localVideo.current");
+            return;
+        }
+        console.log("Has localVideo");
+        console.log("USER VIDEO: ", userVideo.stream);
+        localVideo.current.srcObject = new MediaStream([userVideo.stream]);
+        // localVideoOverlay.current.width = localVideo.current.width
+    }, [localVideo.current, userVideo])
 
     const eventHandler = useCallback( (event) => {
-        console.log(event)
         switch (event.event) {
             case "end":
+                props.handleOnTerminate();
                 history.push("/");
                 delUserData();
                 dispatch(endConference());
+                dispatch(actionsStream.deleteAll());
                 return;
             case "start_record":
                 dispatch(startRecording());
@@ -84,7 +102,6 @@ function Meet(props) {
     }, []);
 
     const isHost = userData["account"]["username"] === userData["conference"]["host_user_id"]
-    console.log("IS_HOST", isHost, userData)
 
     useEffect(() => {
         axios.get(API.conferenceInfo)
@@ -113,6 +130,7 @@ function Meet(props) {
     const history = useHistory();
 
     const handleOnLeave = () => {
+        props.handleOnTerminate();
         axios.post(API.leave)
             .then(response => {
                 delUserData();
@@ -125,6 +143,8 @@ function Meet(props) {
             })
     }
 
+
+
     return (
             <div className="meet-wrapper">
                 <div className="meet_status-bar">
@@ -133,6 +153,9 @@ function Meet(props) {
                     <p className="meet_status-bar_text"><Timer startedTime={startedAt ? new Date(startedAt * 1000) : null} isRunning={!!startedAt}/></p>
                 </div>
                 <div className={"recording_status" + (isRecording ? " enabled" : " disabled")}/>
+                <div className="meet_user_video" ref={localVideoOverlay}>
+                    {userVideo === null ? <div>no video</div> : <video autoPlay={true} ref={localVideo}/>}
+                </div>
                 <Participants/>
                 <div className="meet_control-panel">
                     <div className="meet_control-panel_button participants">

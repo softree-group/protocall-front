@@ -10,7 +10,6 @@ export const startHandler = (e, history, formData, setUserData) => {
                 console.error("Error connection: ", response.status);
                 return null;
             }
-            console.log("Response: ", response.data);
             setUserData(response.data);
             history.push('/meet');
         })
@@ -25,7 +24,6 @@ export const joinHandler = (e, history, formData, setUserData) => {
                 console.error("Error connection: ", response.status);
                 return null
             }
-            console.log("Response: ", response.data);
             setUserData(response.data);
             history.push('/meet');
         })

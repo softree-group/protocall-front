@@ -51,7 +51,6 @@ export class SIPClient {
         this.registerer = new Registerer(this.userAgent);
 
         this.registerer.stateChange.addListener(async (state) => {
-            console.log(`Registration state changed to ${state}`);
 
             this.registrationStateChangeListener && this.registrationStateChangeListener(state);
         });
@@ -81,7 +80,6 @@ export class SIPClient {
     }
 
     async handleMedia(remoteAudioElement, state, session) {
-        console.log(`Session state changed to ${state}`);
 
         const targetState = session instanceof Invitation ? SessionState.Established : SessionState.Establishing;
 

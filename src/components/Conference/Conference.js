@@ -10,6 +10,8 @@ import axios from "axios";
 import {API} from "../../backend/api";
 import Centrifuge from "centrifuge";
 import {AsteriskConfig} from "../../backend/config";
+import {useDispatch} from "react-redux";
+import {actionsStream} from "../../redux/actions";
 
 function Conference(props) {
     const [connected, SetConnected] = useState(false);
@@ -21,9 +23,9 @@ function Conference(props) {
 
     const {userData, delUserData} = useContext(UserContext);
     const history = useHistory();
+    const dispatch = useDispatch();
 
     if (!userData) {
-        console.log("REDIRECT", userData)
         history.push("/");
     }
 
@@ -47,7 +49,7 @@ function Conference(props) {
             return;
         }
         const {username, password} = userData.account;
-        const client = new CyberMegaPhone(username,username, password, "pbx.softex-team.ru", true);
+        const client = new CyberMegaPhone(username,username, password, "aster.softex-team.ru", true);
 
         client.handle("connected", function () {
             console.log("Connected");
@@ -74,17 +76,30 @@ function Conference(props) {
         });
 
         client.handle("failed", function (reason) {
-            console.log("failed");
+            console.log("failed: ", reason);
+            if (reason.cause === "User Denied Media Access") {
+                console.error("Denied Media Access")
+            }
         });
 
         client.handle("ended", function (reason) {
-            console.log("ended");
+            console.log("ended: ", reason)
+            window.location.reload();
         });
 
         client.handle("streamAdded", function (stream) {
             console.log("stream added")
             console.log(stream);
+            if (!stream.local) {
+                console.log(stream.getTracks());
+            }
+            dispatch(actionsStream.add({id: stream.id, kind: stream.kind, local: stream.local, stream: stream}))
             // document.getElementById("media-views").appendChild(createMediaView(stream));
+        });
+
+        client.handle("channel", function (stream) {
+            console.log("channel ", stream);
+            dispatch(actionsStream.add(stream))
         });
 
         client.handle("streamRemoved", function (stream) {
@@ -106,7 +121,9 @@ function Conference(props) {
     const handleOnTerminate = useCallback(async () => {
         try {
             await client.terminate();
+            client.disconnect();
             delUserData();
+            dispatch(actionsStream.deleteAll());
             history.push("/");
         } catch (e) {
             console.error(e);
@@ -148,7 +165,7 @@ function Conference(props) {
 
     return <>
         <audio ref={props.audioRef}/>
-        {connected && <Meet handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
+        {connected && <Meet audio={props.audioRef} handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
         {!connected && <Connection connectionHandler={SetConnected} registrationState={registrationState} call={handleOnCall}/>}
     </>
 }

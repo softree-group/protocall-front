@@ -13,8 +13,6 @@ function Join() {
     const {meetID} = useParams();
     localUserData["meetID"] = meetID;
 
-    console.log(localUserData);
-
     const history = useHistory();
     const {setUserData} = useContext(UserContext);
 

@@ -25,7 +25,6 @@ function Connection(props) {
 
 
     const eventHandler = (data) => {
-        console.log("EVENT DATA: ", data)
         switch (data.event) {
             case "ready":
                 done();

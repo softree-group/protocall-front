@@ -3,11 +3,13 @@ import "./Participants.css";
 import {useContext, useState} from "react";
 import {ConferenceContext, UserContext} from "../../../context/context";
 import {useSelector} from "react-redux";
+import Audio from "../Audio";
 
 function Participants() {
     const {userData} = useContext(UserContext);
     const [clicked, setClicked] = useState(false);
     const participants = useSelector(state => state.conference.participants);
+    const streams = useSelector(state => state.stream.remote);
     const conferenceID = useSelector(state => state.conference.id);
     const users = participants.filter(user => user.id !== userData.account.username);
     const link = conferenceID && window.location.origin + "/join/" + conferenceID;
@@ -21,8 +23,26 @@ function Participants() {
             })
     }
 
+    const getStreamForChannel = (channel) => {
+        console.log("get for channel ", channel);
+        const [found] = streams.filter(stream => stream.channel === channel)
+        console.log("FOUND: ", found)
+        return found ? found.stream : null;
+    }
+
+    let tracks = [];
+    for (let idx = 0; idx < streams.length; idx++) {
+        if (!streams[idx].stream) {
+            continue;
+        }
+        console.log(streams[idx])
+        // console.log(streams[idx].stream);
+        tracks = [...tracks, ...streams[idx].stream.getAudioTracks()];
+    }
+
     const nobodyMessage = (
         <div className="nobody-message" onClick={e => copyHandler()}>
+            {tracks.map(track => <Audio track={track} key={track.id}/>)}
             <p>Nobody here ;(</p>
             <p className="button-link">{clicked ? "Link copied to clipboard!" : "Click to copy link and invite!"}</p>
             <p className="link">{link}</p>
@@ -30,7 +50,8 @@ function Participants() {
     )
     return (
         <div className="participants-wrapper">
-            {users.length > 0 ? users.map(user => <Participant user={user}/>) : nobodyMessage}
+            {tracks.map(track => <Audio track={track} key={track.id}/>)}
+            {users.length > 0 ? users.map(user => <Participant user={{...user, stream: getStreamForChannel(user.channel)}}/>) : nobodyMessage}
         </div>
     )
 }
