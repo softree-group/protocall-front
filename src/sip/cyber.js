@@ -50,6 +50,24 @@ function isUnifiedPlanDefault() {
     return canAddTransceiver;
 }
 
+CyberMegaPhone.prototype.toggleMuteAudio = function () {
+    if (this.audio) {
+        this._rtc.mute({audio: true, video: false});
+    } else {
+        this._rtc.unmute({audio: true, video: false});
+    }
+    this.audio = !this.audio;
+}
+
+CyberMegaPhone.prototype.toggleMuteVideo = function () {
+    if (this.video) {
+        this._rtc.mute({audio: false, video: true});
+    } else {
+        this._rtc.unmute({audio: false, video: true});
+    }
+    this.video = !this.video;
+}
+
 CyberMegaPhone.prototype.connect = function () {
     if (this._ua) {
         this._ua.start(); // Just reconnect

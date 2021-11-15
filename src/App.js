@@ -8,6 +8,7 @@ import axios from "axios";
 import {API} from "./backend/api";
 import Join from "./components/Join/Join";
 import Meet from "./components/Meet/Meet";
+import {Toaster} from "react-hot-toast";
 
 function App() {
   const [userData, setUserData] = useState(null);
@@ -33,6 +34,7 @@ function App() {
 
   return (
       <UserContext.Provider value={{userData, setUserData, delUserData}}>
+          <Toaster/>
           <audio ref={audioRef}/>
           <Switch>
               <Route exact path="/" component={Main}/>

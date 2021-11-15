@@ -15,6 +15,7 @@ import Participants from "./Participants/Participants";
 import Centrifuge from "centrifuge";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsStream, connected, endConference, leave, newConference, startRecording} from "../../redux/actions";
+import {toast} from "react-hot-toast";
 
 function devUserData() {
     return {
@@ -61,6 +62,7 @@ function Meet(props) {
     const eventHandler = useCallback( (event) => {
         switch (event.event) {
             case "end":
+                toast("Conference ended by host")
                 props.handleOnTerminate();
                 history.push("/");
                 delUserData();
@@ -68,6 +70,9 @@ function Meet(props) {
                 dispatch(actionsStream.deleteAll());
                 return;
             case "start_record":
+                toast("Recording has started!", {
+                    icon: "🎬"
+                })
                 dispatch(startRecording());
                 return;
             case "connected":
@@ -168,7 +173,10 @@ function Meet(props) {
                     }>
                         <img src={mute ? microphoneMute : microphone} alt="microphone"/>
                     </div>
-                    <div className="meet_control-panel_button video" onClick={e => setWithoutVideo(!withoutVideo)}>
+                    <div className="meet_control-panel_button video" onClick={e => {
+                        props.handleVideoToggle();
+                        setWithoutVideo(!withoutVideo)
+                    }}>
                         <img src={withoutVideo ? videoOff : video} alt="video"/>
                     </div>
                     {!isRecording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">

@@ -12,6 +12,7 @@ import Centrifuge from "centrifuge";
 import {AsteriskConfig} from "../../backend/config";
 import {useDispatch} from "react-redux";
 import {actionsStream} from "../../redux/actions";
+import {toast} from "react-hot-toast";
 
 function Conference(props) {
     const [connected, SetConnected] = useState(false);
@@ -84,7 +85,15 @@ function Conference(props) {
 
         client.handle("ended", function (reason) {
             console.log("ended: ", reason)
-            window.location.reload();
+            if (reason.originator === "local") {
+                delUserData()
+                dispatch(actionsStream.deleteAll())
+                history.push("/")
+                return
+            }
+            toast.loading("Something went wrong! Restarting")
+            setTimeout(() => window.location.reload(), 500);
+            // window.location.reload();
         });
 
         client.handle("streamAdded", function (stream) {
@@ -139,33 +148,16 @@ function Conference(props) {
 
     const controlMicrophone = useCallback((value) => {
         setMicrophoneOn(value);
-        client.microphone = value;
+        client.toggleMuteAudio();
     }, [client],);
 
     const handleMicrophoneOnToggle = useCallback(() => controlMicrophone(!microphoneOn), [microphoneOn]);
 
-    // useEffect(() => {
-    //     if (!userData) {
-    //         return;
-    //     }
-    //     const username = userData["account"]["username"];
-    //     const password = userData["account"]["password"];
-    //
-    //     (async () => {
-    //         if (!client.initialized) {
-    //             await client.connect(`sip:${username}@pbx.softex-team.ru`, username, password);
-    //             console.log("CLIENT STATE: ", client.lastState);
-    //         }
-    //
-    //         if (callState === SessionState.Established || callState === SessionState.Established) {
-    //             await handleOnTerminate();
-    //         }
-    //     })();
-    // }, [userData]); // eslint-disable-line react-hooks/exhaustive-deps
+    const handleVideoOnToggle = useCallback(() => client.toggleMuteVideo(), [client]);
 
     return <>
         <audio ref={props.audioRef}/>
-        {connected && <Meet audio={props.audioRef} handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
+        {connected && <Meet audio={props.audioRef} handleVideoToggle={handleVideoOnToggle} handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
         {!connected && <Connection connectionHandler={SetConnected} registrationState={registrationState} call={handleOnCall}/>}
     </>
 }

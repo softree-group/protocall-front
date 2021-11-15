@@ -3,6 +3,7 @@
 deploy.sh
 
 test.js
+.env
 
 # dependencies
 /node_modules
