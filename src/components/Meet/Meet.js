@@ -14,8 +14,17 @@ import {useHistory} from "react-router";
 import Participants from "./Participants/Participants";
 import Centrifuge from "centrifuge";
 import {useDispatch, useSelector} from "react-redux";
-import {actionsStream, connected, endConference, leave, newConference, startRecording} from "../../redux/actions";
+import {
+    actionsStream,
+    connected,
+    endConference,
+    leave,
+    newConference,
+    startRecording,
+    toggleMedia
+} from "../../redux/actions";
 import {toast} from "react-hot-toast";
+import ParticipantsList from "./ParticipantsList/ParticipantsList";
 
 function devUserData() {
     return {
@@ -32,8 +41,10 @@ function devUserData() {
 }
 
 function Meet(props) {
-    const [mute, setMute] = useState(false);
+    const [muted, setMute] = useState(false);
     const [withoutVideo, setWithoutVideo] = useState(false);
+    const [participantsListOpened, participantsListToggle] = useState(false);
+    const [sub, setSub] = useState(null);
 
     const {userData, delUserData} = useContext(UserContext);
 
@@ -59,7 +70,7 @@ function Meet(props) {
         // localVideoOverlay.current.width = localVideo.current.width
     }, [localVideo.current, userVideo])
 
-    const eventHandler = useCallback( (event) => {
+    const eventHandler = useCallback( (event, info) => {
         switch (event.event) {
             case "end":
                 toast("Conference ended by host")
@@ -81,8 +92,11 @@ function Meet(props) {
             case "leave":
                 dispatch(leave(event.user));
                 return;
+            case "toggle_media":
+                dispatch(toggleMedia({user: info.user, options: event.options}))
+                return;
             default:
-                console.log();
+                console.log(event);
         }
     }, []);
 
@@ -98,9 +112,11 @@ function Meet(props) {
             console.log("disconnected", ctx);
         });
 
-        centrifuge.subscribe("conference~" + userData["conference"]["id"], function(ctx) {
-            eventHandler(ctx.data)
+        const sub = centrifuge.subscribe("conference:" + userData["conference"]["id"], function(ctx) {
+            eventHandler(ctx.data, ctx.info)
         });
+
+        setSub(sub);
 
         centrifuge.connect();
         return () => centrifuge.disconnect()
@@ -148,6 +164,10 @@ function Meet(props) {
             })
     }
 
+    const handleOnClickParticipants = () => {
+        participantsListToggle(!participantsListOpened);
+    }
+
 
 
     return (
@@ -163,17 +183,32 @@ function Meet(props) {
                 </div>
                 <Participants/>
                 <div className="meet_control-panel">
-                    <div className="meet_control-panel_button participants">
+                    <div className="meet_control-panel_button participants" onClick={handleOnClickParticipants}>
                         <img src={avatar} alt="participants"/>
+                        {participantsListOpened && <ParticipantsList/>}
                     </div>
                     <div className="meet_control-panel_button microphone" onClick={e => {
+                        sub.publish({
+                            event: "toggle_media",
+                            options: {
+                                audioMuted: !muted,
+                                videoMuted: withoutVideo,
+                            },
+                        })
                         props.handleMicrophoneOnToggle();
-                        setMute(!mute);
+                        setMute(!muted);
                     }
                     }>
-                        <img src={mute ? microphoneMute : microphone} alt="microphone"/>
+                        <img src={muted ? microphoneMute : microphone} alt="microphone"/>
                     </div>
                     <div className="meet_control-panel_button video" onClick={e => {
+                        sub.publish({
+                            event: "toggle_media",
+                            options: {
+                                audioMuted: muted,
+                                videoMuted: !withoutVideo,
+                            },
+                        })
                         props.handleVideoToggle();
                         setWithoutVideo(!withoutVideo)
                     }}>

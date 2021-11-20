@@ -4,6 +4,7 @@ export const SOCKET = {
     LEAVE: "socket/leave",
     START_RECORD: "socket/start_record",
     END: "socket/end",
+    TOGGLE_MEDIA: "socket/toggle_media",
 }
 
 export const CONFERENCE = {

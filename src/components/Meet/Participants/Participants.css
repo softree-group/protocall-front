@@ -31,7 +31,7 @@
     border-radius: 5px;
 }
 
-.participants-wrapper .participant img {
+.participants-wrapper .participant .avatar {
     filter: invert();
     position: absolute;
     left: 50%;
@@ -75,9 +75,11 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
+    border-radius: 10px;
 }
 
 .participant_picture video {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -85,6 +87,39 @@
 
 .participant {
     overflow: hidden;
+    cursor: pointer;
 }
 
+.participant_user-media-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 34px;
+    width: 75px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.participant_user-media-container img {
+    filter: invert(16%) sepia(93%) saturate(5436%) hue-rotate(1deg) brightness(119%) contrast(130%);
+    opacity: 0.4;
+    margin: 0 5px;
+}
+
+.video-full-size {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    background: rgba(0,0,0,0.7);
+}
+
+.video-full-size video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 

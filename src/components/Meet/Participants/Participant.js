@@ -1,8 +1,10 @@
 import avatar from "../../../images/avatar.svg"
-import {useEffect, useRef} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
+import mutedMicrophone from "../../../images/microphone_mute.svg";
+import mutedVideo from "../../../images/video_off.svg";
 
 function Participant({user}) {
-
+    const [full, setFull] = useState(false);
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -24,17 +26,36 @@ function Participant({user}) {
             console.log("loaded")
 
         }
-    }, [videoRef.current, user.stream])
+    }, [videoRef.current, user.stream]);
+
+    const handleClick = e => {
+        if (user.videoMuted) {
+            return;
+        }
+        e.stopPropagation()
+        setFull(!full);
+    }
 
     return (
-        <div className="participant">
-            <div className="participant_picture">
-                <img src={avatar} alt="user avatar"/>
-                <video ref={videoRef} autoPlay={true}/>
+        <>
+            <div className="participant" onClick={handleClick}>
+                <div className="participant_picture">
+                    <img className="avatar" src={avatar} alt="user avatar"/>
+                    {!user.videoMuted && <video ref={videoRef} autoPlay={true}/>}
+                </div>
+                <div className="participant_user-media-container">
+                    {user.audioMuted && <img src={mutedMicrophone} className="user_media_image" alt="muted audio"/>}
+                    {user.videoMuted && <img src={mutedVideo} className="user_media_image" alt="muted video"/>}
+                </div>
+                <p className="participant_name">{user.name}</p>
             </div>
-            <p className="participant_name">{user.name}</p>
-        </div>
-    )
+            {full &&
+                <div className="video-full-size" onClick={handleClick}>
+                    <video onClick={handleClick} ref={videoRef} autoPlay={true}/>
+                </div>
+            }
+        </>
+    );
 }
 
 export default Participant;

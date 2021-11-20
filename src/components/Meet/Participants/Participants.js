@@ -10,8 +10,8 @@ function Participants() {
     const [clicked, setClicked] = useState(false);
     const participants = useSelector(state => state.conference.participants);
     const streams = useSelector(state => state.stream.remote);
-    const conferenceID = useSelector(state => state.conference.id);
     const users = participants.filter(user => user.id !== userData.account.username);
+    const conferenceID = useSelector(state => state.conference.id);
     const link = conferenceID && window.location.origin + "/join/" + conferenceID;
     const copyHandler = () => {
         navigator.clipboard.writeText(link)
@@ -35,9 +35,8 @@ function Participants() {
         if (!streams[idx].stream) {
             continue;
         }
-        console.log(streams[idx])
-        // console.log(streams[idx].stream);
         tracks = [...tracks, ...streams[idx].stream.getAudioTracks()];
+        console.log("TRACKS: ", tracks)
     }
 
     const nobodyMessage = (

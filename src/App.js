@@ -8,7 +8,7 @@ import axios from "axios";
 import {API} from "./backend/api";
 import Join from "./components/Join/Join";
 import Meet from "./components/Meet/Meet";
-import {Toaster} from "react-hot-toast";
+import {toast, Toaster} from "react-hot-toast";
 
 function App() {
   const [userData, setUserData] = useState(null);
@@ -31,6 +31,12 @@ function App() {
               delUserData();
           })
   }, []);
+
+  useEffect(() => {
+      if (!window.chrome) {
+          toast.error("Настоятельно рекомендуем использовать Google Chrome. В случае продолжения использования данного браузера возможны непредвиденные ошибки", {duration: 6000})
+      }
+  }, [])
 
   return (
       <UserContext.Provider value={{userData, setUserData, delUserData}}>

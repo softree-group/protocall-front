@@ -9,10 +9,17 @@ const initialState = {
 
 export const conferenceReducer = (state = initialState, action) => {
     switch (action.type) {
+        case SOCKET.TOGGLE_MEDIA:
+            const foundIdx = state.participants.findIndex(user => user.id === action.payload.user)
+            if (foundIdx === -1) {
+                return state;
+            }
+            const [found] = state.participants.splice(foundIdx, 1);
+            return {...state, participants: [...state.participants, {...found, ...action.payload.options}]};
         case SOCKET.CONNECTED:
-            const foundIdx = state.participants.findIndex(user => user.id === action.payload.id)
-            if (foundIdx !== -1) {
-                const [found] = state.participants.splice(foundIdx, 1);
+            const foundIndex = state.participants.findIndex(user => user.id === action.payload.id)
+            if (foundIndex !== -1) {
+                const [found] = state.participants.splice(foundIndex, 1);
                 return {...state, participants: [...state.participants, action.payload]}
             }
             return {...state, participants: [...state.participants, action.payload]}

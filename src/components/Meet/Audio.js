@@ -11,6 +11,7 @@ function Audio({track}) {
         audioRef.current.srcObject = stream;
         track.enabled = true;
         audioRef.current.valume = 1;
+        console.log("Enable stream: ", stream);
     }, [audioRef.current, track])
 
     return (
