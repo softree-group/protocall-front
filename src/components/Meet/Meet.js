@@ -41,8 +41,8 @@ function devUserData() {
 }
 
 function Meet(props) {
-    const [muted, setMute] = useState(false);
-    const [withoutVideo, setWithoutVideo] = useState(false);
+    const [muted, setMute] = useState(true);
+    const [withoutVideo, setWithoutVideo] = useState(true);
     const [participantsListOpened, participantsListToggle] = useState(false);
     const [sub, setSub] = useState(null);
 
@@ -178,9 +178,10 @@ function Meet(props) {
                     <p className="meet_status-bar_text"><Timer startedTime={startedAt ? new Date(startedAt * 1000) : null} isRunning={!!startedAt}/></p>
                 </div>
                 <div className={"recording_status" + (isRecording ? " enabled" : " disabled")}/>
-                <div className="meet_user_video" ref={localVideoOverlay}>
-                    {userVideo === null ? <div>no video</div> : <video autoPlay={true} ref={localVideo}/>}
-                </div>
+                    <div className="meet_user_video" ref={localVideoOverlay} style={withoutVideo ? {display: "none"} : {}}>
+                        <video autoPlay={true} ref={localVideo}/>
+                    </div>
+
                 <Participants/>
                 <div className="meet_control-panel">
                     <div className="meet_control-panel_button participants" onClick={handleOnClickParticipants}>
@@ -188,12 +189,16 @@ function Meet(props) {
                         {participantsListOpened && <ParticipantsList/>}
                     </div>
                     <div className="meet_control-panel_button microphone" onClick={e => {
+                        const options = {
+                            audioMuted: !muted,
+                            videoMuted: withoutVideo,
+                        }
+
+                        axios.post(API.media, options);
+
                         sub.publish({
                             event: "toggle_media",
-                            options: {
-                                audioMuted: !muted,
-                                videoMuted: withoutVideo,
-                            },
+                            options: options,
                         })
                         props.handleMicrophoneOnToggle();
                         setMute(!muted);
@@ -202,12 +207,20 @@ function Meet(props) {
                         <img src={muted ? microphoneMute : microphone} alt="microphone"/>
                     </div>
                     <div className="meet_control-panel_button video" onClick={e => {
+                        const options = {
+                            audioMuted: muted,
+                            videoMuted: !withoutVideo,
+                        }
+
+                        axios.post(API.media, options);
+
                         sub.publish({
                             event: "toggle_media",
-                            options: {
-                                audioMuted: muted,
-                                videoMuted: !withoutVideo,
-                            },
+                            options: options,
+                        })
+                        sub.publish({
+                            event: "toggle_media",
+                            options: options,
                         })
                         props.handleVideoToggle();
                         setWithoutVideo(!withoutVideo)

@@ -85,6 +85,8 @@ function Connection(props) {
 
     const done = () => {
         setProgress(90);
+        props.client.toggleMuteAudio();
+        props.client.toggleMuteVideo();
         setTimeout(() => {
             props.connectionHandler(true);
         }, 500)

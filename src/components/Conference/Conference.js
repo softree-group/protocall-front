@@ -17,7 +17,7 @@ import {toast} from "react-hot-toast";
 function Conference(props) {
     const [connected, SetConnected] = useState(false);
     const [soundOn, setSoundOn] = useState(true);
-    const [microphoneOn, setMicrophoneOn] = useState(true);
+    const [microphoneOn, setMicrophoneOn] = useState(false);
     const [registrationState, setRegistrationHandler] = useState(null)
     const [callState, setCallState] = useState(null)
     const [startedTime, setCallStartedTime] = useState(null)
@@ -50,7 +50,14 @@ function Conference(props) {
             return;
         }
         const {username, password} = userData.account;
-        const client = new CyberMegaPhone(username,username, password, "aster.softex-team.ru", true);
+        const client = new CyberMegaPhone(
+            username,
+            username,
+            password,
+            "aster.softex-team.ru",
+            true,
+            true,
+            true);
 
         client.handle("connected", function () {
             console.log("Connected");
@@ -125,6 +132,8 @@ function Conference(props) {
 
     const handleOnCall = useCallback(async () => {
         client.call(AsteriskConfig.callNumber)
+        // client.toggleMuteAudio();
+        // client.toggleMuteVideo();
     }, [props.audioRef, client]);
 
     const handleOnTerminate = useCallback(async () => {
@@ -158,7 +167,7 @@ function Conference(props) {
     return <>
         <audio ref={props.audioRef}/>
         {connected && <Meet audio={props.audioRef} handleVideoToggle={handleVideoOnToggle} handleSoundOnToggle={handleSoundOnToggle} handleMicrophoneOnToggle={handleMicrophoneOnToggle} handleOnTerminate={handleOnTerminate}/>}
-        {!connected && <Connection connectionHandler={SetConnected} registrationState={registrationState} call={handleOnCall}/>}
+        {!connected && <Connection client={client} connectionHandler={SetConnected} registrationState={registrationState} call={handleOnCall}/>}
     </>
 }
 

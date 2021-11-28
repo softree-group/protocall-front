@@ -7,6 +7,11 @@ const initialState = {
     started_at: null
 }
 
+const defaultMediaMuted = {
+    audioMuted: true,
+    videoMuted: true,
+}
+
 export const conferenceReducer = (state = initialState, action) => {
     switch (action.type) {
         case SOCKET.TOGGLE_MEDIA:
@@ -20,9 +25,9 @@ export const conferenceReducer = (state = initialState, action) => {
             const foundIndex = state.participants.findIndex(user => user.id === action.payload.id)
             if (foundIndex !== -1) {
                 const [found] = state.participants.splice(foundIndex, 1);
-                return {...state, participants: [...state.participants, action.payload]}
+                return {...state, participants: [...state.participants, {...action.payload, ...defaultMediaMuted}]}
             }
-            return {...state, participants: [...state.participants, action.payload]}
+            return {...state, participants: [...state.participants, {...action.payload, ...defaultMediaMuted}]}
         case SOCKET.LEAVE:
             return {...state, participants: state.participants.filter(user => user.id !== action.payload.id)}
         case CONFERENCE.NEW:

@@ -6,6 +6,7 @@ export const API = {
     ready: "/conference/ready",
     session: "/session",
     conferenceInfo: "/conference",
+    media: "/media",
 }
 
 function setPrefix(prefix, API) {

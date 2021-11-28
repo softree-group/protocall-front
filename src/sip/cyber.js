@@ -215,6 +215,7 @@ CyberMegaPhone.prototype.answer = function (rtc) {
 };
 
 CyberMegaPhone.prototype.call = function (exten) {
+    console.log("CALL ", exten)
     if (!this._ua || !exten) {
         return;
     }
