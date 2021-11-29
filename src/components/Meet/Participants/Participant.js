@@ -49,11 +49,9 @@ function Participant({user}) {
                 </div>
                 <p className="participant_name">{user.name}</p>
             </div>
-            {full &&
-                <div className="video-full-size" onClick={handleClick}>
-                    <video onClick={handleClick} ref={videoRef} autoPlay={true}/>
-                </div>
-            }
+            <div style={full ? {} : {display : "none"}} className="video-full-size" onClick={handleClick}>
+                <video onClick={handleClick} ref={videoRef} autoPlay={true}/>
+            </div>
         </>
     );
 }
