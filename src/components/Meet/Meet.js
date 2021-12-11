@@ -70,10 +70,17 @@ function Meet(props) {
         // localVideoOverlay.current.width = localVideo.current.width
     }, [localVideo.current, userVideo])
 
+    const endConfMessage = useCallback(() => {
+        if (isRecording) {
+            toast.success("The protocol will be sent by email")
+        }
+    }, [isRecording])
+
     const eventHandler = useCallback( (event, info) => {
         switch (event.event) {
             case "end":
                 toast("Conference ended by host")
+                endConfMessage();
                 props.handleOnTerminate();
                 history.push("/");
                 delUserData();
@@ -154,11 +161,13 @@ function Meet(props) {
         props.handleOnTerminate();
         axios.post(API.leave)
             .then(response => {
+                endConfMessage();
                 delUserData();
                 history.push("/");
             })
             .catch(err => {
                 console.error(err);
+                endConfMessage();
                 delUserData();
                 history.push("/");
             })
@@ -230,7 +239,7 @@ function Meet(props) {
                     {!isRecording && isHost && <div onClick={() => recordHandle()} className="meet_control-panel_button record">
                         <span>rec</span>
                     </div>}
-                    <div onClick={() => handleOnLeave()} className="meet_control-panel_button leave">
+                    <div onClick={handleOnLeave} className="meet_control-panel_button leave">
                         <img src={leavePhone} alt="leave"/>
                     </div>
                 </div>
