@@ -173,7 +173,7 @@ function Meet(props) {
     return (
             <div className="meet-wrapper">
                 <div className="meet_status-bar">
-                    <p className="meet_status-bar_text">{userData["conference"]["id"]}</p>
+                    <p className="meet_status-bar_text">{userData["conference"]["title"]}</p>
                     {/*<p className="meet_status-bar_text"></p>*/}
                     <p className="meet_status-bar_text"><Timer startedTime={startedAt ? new Date(startedAt * 1000) : null} isRunning={!!startedAt}/></p>
                 </div>

@@ -7,12 +7,23 @@ function StartForm({initData, submitHandler}) {
         "email": ""
     });
 
+    const [titlePressed, setTitlePressed] = useState(false)
+
+    const titleHandler = e => {
+        setTitlePressed(true)
+        inputChangeHandler(e, setFormData)
+    }
+
     return (
         <form className="action-form_form" onSubmit={e => submitHandler(e, formData)}>
             <p className="action-form_title">Start meeting</p>
             <div className="form-input">
                 <p className="label">Your name</p>
                 <input type="text" defaultValue={formData["name"]} required={true} name="name" onChange={e => inputChangeHandler(e, setFormData, "user")}/>
+            </div>
+            <div className="form-input">
+                <p className="label">Meeting title</p>
+                <input type="text" value={titlePressed ? formData["title"] : formData["name"] ? `${formData["name"]}'s meeting` : ""} required={true} name="title" onChange={titleHandler}/>
             </div>
             <div className="form-input">
                 <p className="label">Your email</p>

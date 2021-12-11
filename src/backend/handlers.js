@@ -5,6 +5,7 @@ import {toast} from "react-hot-toast";
 export const startHandler = (e, history, formData, setUserData) => {
     e.preventDefault();
     formData["need_protocol"] = true;
+    formData["title"] = formData["title"] ? formData["title"] : `${formData["name"]}'s meeting`
     axios.post(API.start, formData)
         .then(response => {
             if (response.status !== 200 && response.status !== 208) {
